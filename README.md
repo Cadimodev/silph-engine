@@ -74,12 +74,14 @@ classDiagram
     Deck: -UUID id
     Deck: -String name
     Deck: -User owner
+    Deck: -List~DeckCard~ cards
     Deck: -Boolean isLegal
 
     DeckCard: -UUID id
     DeckCard: -Card card
     DeckCard: -Deck deck
     DeckCard: -Integer quantity
+
 ```
 ---
 
