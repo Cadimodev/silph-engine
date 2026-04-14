@@ -1,0 +1,29 @@
+package com.silphengine.application.mappers;
+
+import com.silphengine.domain.dto.requests.ExpansionRequest;
+import com.silphengine.domain.entities.Expansion;
+import org.springframework.stereotype.Component;
+
+@Component
+public class ExpansionMapper {
+
+    public Expansion toEntity(ExpansionRequest request) {
+        return Expansion.builder()
+                .externalId(request.externalId())
+                .name(request.name())
+                .serieName(request.serieName())
+                .releaseDate(request.releaseDate())
+                .totalCards(request.totalCards())
+                .logoUrl(request.logoUrl())
+                .build();
+    }
+
+    public void UpdateEntityFromRequest(Expansion expansion, ExpansionRequest expansionRequest) {
+
+        expansion.setName(expansionRequest.name());
+        expansion.setSerieName(expansionRequest.serieName());
+        expansion.setReleaseDate(expansionRequest.releaseDate());
+        expansion.setTotalCards(expansionRequest.totalCards());
+        expansion.setLogoUrl(expansionRequest.logoUrl());
+    }
+}
