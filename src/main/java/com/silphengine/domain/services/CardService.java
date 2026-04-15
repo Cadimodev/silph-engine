@@ -11,9 +11,11 @@ public interface CardService {
 
     public CardResponse getByExternalId(String externalId);
 
+    public List<CardResponse> getAllCards();
+
     public List<CardResponse> getByExternalExpansionId(String externalExpansionId);
 
-    public CardResponse updateByExternalId(CardRequest cardRequest);
+    public CardResponse updateByExternalId(String externalId, CardRequest cardRequest);
 
     public void deleteByExternalId(String externalId);
 }

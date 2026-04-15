@@ -8,7 +8,7 @@ public record CardResponse(
         String externalId,
         String name,
         String rarity,
-        CardCategory category,
+        CardCategory cardCategory,
         List<CardType> types,
         String imageUrl,
         String expansionExternalId

@@ -52,6 +52,16 @@ public class CardServiceImpl implements CardService {
     }
 
     @Override
+    public List<CardResponse> getAllCards() {
+
+        // TODO: Add pagination to this
+        return cardRepository.findAll()
+                .stream()
+                .map(cardMapper::toResponse)
+                .toList();
+    }
+
+    @Override
     public List<CardResponse> getByExternalExpansionId(String externalExpansionId) {
 
         return cardRepository.findByExpansion_ExternalId(externalExpansionId)
@@ -62,10 +72,10 @@ public class CardServiceImpl implements CardService {
 
     @Override
     @Transactional
-    public CardResponse updateByExternalId(CardRequest cardRequest) {
+    public CardResponse updateByExternalId(String externalId, CardRequest cardRequest) {
 
-        Card card = cardRepository.findByExternalId(cardRequest.externalId())
-                .orElseThrow(() -> new ResourceNotFoundException("Card with ID: " + cardRequest.externalId() + " not found"));
+        Card card = cardRepository.findByExternalId(externalId)
+                .orElseThrow(() -> new ResourceNotFoundException("Card with ID: " + externalId + " not found"));
 
         if (!card.getExpansion().getExternalId().equals(cardRequest.expansionExternalId())) {
             Expansion newExpansion = expansionRepository.findByExternalId(cardRequest.expansionExternalId())

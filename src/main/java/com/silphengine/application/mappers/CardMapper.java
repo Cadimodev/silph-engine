@@ -7,6 +7,7 @@ import com.silphengine.domain.entities.Card;
 import com.silphengine.domain.entities.Expansion;
 import com.silphengine.domain.enums.CardCategory;
 import com.silphengine.domain.enums.CardType;
+import com.silphengine.domain.exceptions.BadRequestException;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -52,7 +53,7 @@ public class CardMapper {
     private CardCategory mapStringToCardCategory(String cardCategoryString) {
 
         if (cardCategoryString == null || cardCategoryString.isBlank()) {
-            throw new RuntimeException("Card category cannot be null or empty");
+            throw new BadRequestException("Card category cannot be null or empty");
         }
 
         try {

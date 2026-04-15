@@ -25,7 +25,7 @@ public class ExpansionController {
     }
 
     @GetMapping("/{externalId}")
-    public ResponseEntity<ExpansionResponse> getByExternalId(@PathVariable String externalId) {
+    public ResponseEntity<ExpansionResponse> getExpansionByExternalId(@PathVariable String externalId) {
         return ResponseEntity.ok(expansionService.getByExternalId(externalId));
     }
 
