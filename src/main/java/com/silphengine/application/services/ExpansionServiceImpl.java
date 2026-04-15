@@ -12,6 +12,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -50,13 +52,22 @@ public class ExpansionServiceImpl implements ExpansionService {
 
     @Override
     @Transactional
-    public ExpansionResponse updateByExternalId(ExpansionRequest expansionRequest) {
+    public ExpansionResponse updateByExternalId(String externalId, ExpansionRequest expansionRequest) {
 
-        Expansion expansion = expansionRepository.findByExternalId(expansionRequest.externalId())
-                .orElseThrow(() -> new ResourceNotFoundException("Expansion with ID " + expansionRequest.externalId() + " not found"));
+        Expansion expansion = expansionRepository.findByExternalId(externalId)
+                .orElseThrow(() -> new ResourceNotFoundException("Expansion with ID " + externalId + " not found"));
 
         expansionMapper.updateEntityFromRequest(expansion, expansionRequest);
 
         return expansionMapper.toResponse(expansionRepository.save(expansion));
+    }
+
+    @Override
+    public List<ExpansionResponse> getAllExpansions() {
+
+       return expansionRepository.findAll()
+                .stream()
+                .map(expansionMapper::toResponse)
+                .toList();
     }
 }
