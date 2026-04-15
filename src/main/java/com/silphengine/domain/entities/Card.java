@@ -1,6 +1,7 @@
 package com.silphengine.domain.entities;
 
 import com.silphengine.domain.enums.CardCategory;
+import com.silphengine.domain.enums.CardType;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -31,10 +32,11 @@ public class Card {
     @Column(name = "image_url")
     private String imageUrl;
 
-    @ElementCollection
+    @ElementCollection(targetClass = CardType.class)
     @CollectionTable(name = "card_types", joinColumns = @JoinColumn(name = "card_id"))
-    @Column(name = "types")
-    private List<String> types;
+    @Column(name = "type_name")
+    @Enumerated(EnumType.STRING)
+    private List<CardType> types;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "expansion_id", nullable = false)

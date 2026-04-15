@@ -11,7 +11,5 @@ public interface CardRepository extends JpaRepository<Card, UUID> {
 
     public Optional<Card> findByExternalId(String externalId);
 
-    public Optional<Card> findByName(String name);
-
-    public List<Card> findByExpansionId(UUID expansionId);
+    public List<Card> findByExpansion_ExternalId(String expansionExternalId);
 }
