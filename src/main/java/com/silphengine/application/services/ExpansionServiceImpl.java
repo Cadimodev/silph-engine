@@ -59,7 +59,7 @@ public class ExpansionServiceImpl implements ExpansionService {
 
         expansionMapper.updateEntityFromRequest(expansion, expansionRequest);
 
-        return expansionMapper.toResponse(expansionRepository.save(expansion));
+        return expansionMapper.toResponse(expansion);
     }
 
     @Override

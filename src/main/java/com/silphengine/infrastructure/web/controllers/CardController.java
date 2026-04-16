@@ -4,6 +4,7 @@ import com.silphengine.domain.dto.requests.CardRequest;
 import com.silphengine.domain.dto.responses.CardResponse;
 import com.silphengine.domain.exceptions.BadRequestException;
 import com.silphengine.domain.services.CardService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,7 +20,7 @@ public class CardController {
     private final CardService cardService;
 
     @PostMapping
-    public ResponseEntity<CardResponse> createCard(@RequestBody CardRequest request) {
+    public ResponseEntity<CardResponse> createCard(@Valid @RequestBody CardRequest request) {
 
         CardResponse response = cardService.createCard(request);
         return new ResponseEntity<>(response,HttpStatus.CREATED);
@@ -44,7 +45,7 @@ public class CardController {
     @PutMapping("/{externalId}")
     public ResponseEntity<CardResponse> updateCardByExternalId(
             @PathVariable String externalId,
-            @RequestBody CardRequest request) {
+            @Valid @RequestBody CardRequest request) {
 
         if (!externalId.equals(request.externalId())) {
             throw new BadRequestException("The ID in the URL (" + externalId +

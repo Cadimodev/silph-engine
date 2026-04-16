@@ -4,6 +4,7 @@ import com.silphengine.domain.dto.requests.ExpansionRequest;
 import com.silphengine.domain.dto.responses.ExpansionResponse;
 import com.silphengine.domain.exceptions.BadRequestException;
 import com.silphengine.domain.services.ExpansionService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,7 +20,7 @@ public class ExpansionController {
     private final ExpansionService expansionService;
 
     @PostMapping
-    public ResponseEntity<ExpansionResponse> createExpansion(@RequestBody ExpansionRequest request) {
+    public ResponseEntity<ExpansionResponse> createExpansion(@Valid @RequestBody ExpansionRequest request) {
         ExpansionResponse response = expansionService.createExpansion(request);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
@@ -37,7 +38,7 @@ public class ExpansionController {
     @PutMapping("/{externalId}")
     public ResponseEntity<ExpansionResponse> updateExpansion(
             @PathVariable String externalId,
-            @RequestBody ExpansionRequest request) {
+            @Valid @RequestBody ExpansionRequest request) {
 
         if (!externalId.equals(request.externalId())) {
             throw new BadRequestException("The ID in the URL (" + externalId +

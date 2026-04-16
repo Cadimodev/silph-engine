@@ -7,13 +7,13 @@ import java.util.List;
 
 public interface ExpansionService {
 
-    public ExpansionResponse createExpansion(ExpansionRequest expansionRequest);
+    ExpansionResponse createExpansion(ExpansionRequest expansionRequest);
 
-    public ExpansionResponse getByExternalId(String externalId);
+    ExpansionResponse getByExternalId(String externalId);
 
-    public void removeByExternalId(String externalId);
+    void removeByExternalId(String externalId);
 
-    public ExpansionResponse updateByExternalId(String externalId, ExpansionRequest expansionRequest);
+    ExpansionResponse updateByExternalId(String externalId, ExpansionRequest expansionRequest);
 
     List<ExpansionResponse> getAllExpansions();
 }

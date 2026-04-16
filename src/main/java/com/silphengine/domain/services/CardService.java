@@ -7,15 +7,15 @@ import java.util.List;
 
 public interface CardService {
 
-    public CardResponse createCard(CardRequest cardRequest);
+    CardResponse createCard(CardRequest cardRequest);
 
-    public CardResponse getByExternalId(String externalId);
+    CardResponse getByExternalId(String externalId);
 
-    public List<CardResponse> getAllCards();
+    List<CardResponse> getAllCards();
 
-    public List<CardResponse> getByExternalExpansionId(String externalExpansionId);
+    List<CardResponse> getByExternalExpansionId(String externalExpansionId);
 
-    public CardResponse updateByExternalId(String externalId, CardRequest cardRequest);
+    CardResponse updateByExternalId(String externalId, CardRequest cardRequest);
 
-    public void deleteByExternalId(String externalId);
+    void deleteByExternalId(String externalId);
 }
