@@ -3,16 +3,18 @@ package com.silphengine.infrastructure.web.exceptions;
 import com.silphengine.domain.exceptions.BadRequestException;
 import com.silphengine.domain.exceptions.DuplicateResourceException;
 import com.silphengine.domain.exceptions.ResourceNotFoundException;
+import com.silphengine.domain.exceptions.TokenRefreshException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.ControllerAdvice;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.time.LocalDateTime;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-@ControllerAdvice
+@RestControllerAdvice
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(ResourceNotFoundException.class)
@@ -30,6 +32,16 @@ public class GlobalExceptionHandler {
         return buildResponse(HttpStatus.BAD_REQUEST, ex.getMessage());
     }
 
+    @ExceptionHandler(AuthenticationException.class)
+    public ResponseEntity<Object> handleAuthenticationException(AuthenticationException ex) {
+        return buildResponse(HttpStatus.UNAUTHORIZED, "Invalid credentials provided.");
+    }
+
+    @ExceptionHandler(TokenRefreshException.class)
+    public ResponseEntity<Object> handleTokenRefreshException(TokenRefreshException ex) {
+        return buildResponse(HttpStatus.FORBIDDEN, ex.getMessage());
+    }
+
     private ResponseEntity<Object> buildResponse(HttpStatus status, String message) {
         Map<String, Object> body = new LinkedHashMap<>();
         body.put("timestamp", LocalDateTime.now());
@@ -38,6 +50,5 @@ public class GlobalExceptionHandler {
         body.put("message", message);
 
         return new ResponseEntity<>(body, status);
-
     }
 }

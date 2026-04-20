@@ -1,11 +1,16 @@
 package com.silphengine.domain.entities;
 
+import com.silphengine.domain.enums.Role;
+import jakarta.annotation.Nonnull;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
-
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
@@ -16,7 +21,7 @@ import java.util.UUID;
 @Builder
 @Getter
 @ToString
-public class User {
+public class User implements UserDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -30,6 +35,10 @@ public class User {
 
     @Column(nullable = false)
     private String password;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Role role;
 
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
@@ -64,4 +73,39 @@ public class User {
         card.setOwner(null);
     }
 
+    @Override
+    @Nonnull
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return List.of(new SimpleGrantedAuthority("ROLE_" + role.name()));
+    }
+
+    @Override
+    @Nonnull
+    public String getUsername() {
+        return nickname;
+    }
+
+    @Override
+    @Nonnull
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    @Nonnull
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    @Nonnull
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    @Nonnull
+    public boolean isEnabled() {
+        return true;
+    }
 }

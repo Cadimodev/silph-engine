@@ -3,6 +3,7 @@ package com.silphengine.application.mappers;
 import com.silphengine.domain.dto.requests.UserProfileRequest;
 import com.silphengine.domain.dto.requests.UserRequest;
 import com.silphengine.domain.dto.responses.UserResponse;
+import com.silphengine.domain.enums.Role;
 import com.silphengine.domain.entities.User;
 import org.springframework.stereotype.Component;
 
@@ -14,6 +15,7 @@ public class UserMapper {
                .nickname(userRequest.nickname())
                .email(userRequest.email())
                .password(encodedPassword)
+               .role(Role.USER)
                .build();
     }
 
