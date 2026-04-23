@@ -1,5 +1,6 @@
 package com.silphengine.infrastructure.web.controllers;
 
+import com.silphengine.domain.exceptions.DuplicateResourceException;
 import tools.jackson.databind.json.JsonMapper;
 import com.silphengine.domain.dto.requests.LoginRequest;
 import com.silphengine.domain.dto.requests.RefreshTokenRequest;
@@ -68,6 +69,36 @@ class AuthenticationControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(invalidUserRequest)))
                 .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void register_shouldReturnConflict_whenNicknameAlreadyExists() throws Exception {
+
+        // Given
+        UserRequest existingUserRequest = new UserRequest("existinguser", "test@example.com", "Password123!");
+        when(authenticationService.register(any(UserRequest.class)))
+                .thenThrow(new DuplicateResourceException("Username already exists"));
+
+        // When & Then
+        mockMvc.perform(post("/api/v1/auth/register")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(existingUserRequest)))
+                .andExpect(status().isConflict()); 
+    }
+
+    @Test
+    void register_shouldReturnConflict_whenEmailAlreadyExists() throws Exception {
+
+        // Given
+        UserRequest existingUserRequest = new UserRequest("test", "existing@example.com", "Password123!");
+        when(authenticationService.register(any(UserRequest.class)))
+                .thenThrow(new DuplicateResourceException("Email already exists"));
+
+        // When & Then
+        mockMvc.perform(post("/api/v1/auth/register")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(existingUserRequest)))
+                .andExpect(status().isConflict());
     }
 
     @Test
