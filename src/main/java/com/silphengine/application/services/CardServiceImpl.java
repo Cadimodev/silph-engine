@@ -86,7 +86,7 @@ public class CardServiceImpl implements CardService {
 
         cardMapper.updateEntityFromRequest(card, cardRequest);
 
-        return cardMapper.toResponse(card);
+        return cardMapper.toResponse(cardRepository.save(card));
     }
 
     @Override

@@ -88,7 +88,7 @@ public class UserServiceImpl implements UserService {
         }
 
         userMapper.updateEntityFromRequest(user, userProfileRequest);
-        return userMapper.toResponse(user);
+        return userMapper.toResponse(userRepository.save(user));
     }
 
     @Override
@@ -103,6 +103,8 @@ public class UserServiceImpl implements UserService {
 
         String newEncodedPassword = passwordEncoder.encode(passwordChangeRequest.newPassword());
         user.changePassword(newEncodedPassword);
+        
+        userRepository.save(user);
     }
 
     @Override
