@@ -49,11 +49,20 @@ public class Card {
     @Enumerated(EnumType.STRING)
     private CardCategory cardCategory;
 
-    public void updateDetails(String name, String rarity, CardCategory cardCategory, List<CardType> types, String imageUrl) {
+    @Column()
+    private String regulationMark;
+
+    public void updateDetails(String name, String rarity, CardCategory cardCategory, List<CardType> types, String imageUrl, String regulationMark) {
         this.name = name;
         this.rarity = rarity;
         this.cardCategory = cardCategory;
         this.types = types;
         this.imageUrl = imageUrl;
+
+        if (regulationMark != null) {
+            this.regulationMark = regulationMark.toUpperCase();
+        } else {
+            this.regulationMark = null;
+        }
     }
 }

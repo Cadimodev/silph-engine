@@ -11,5 +11,6 @@ public record CardResponse(
         CardCategory cardCategory,
         List<CardType> types,
         String imageUrl,
-        String expansionExternalId
+        String expansionExternalId,
+        String regulationMark
 ) {}

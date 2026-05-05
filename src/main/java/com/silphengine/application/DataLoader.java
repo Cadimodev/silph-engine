@@ -37,26 +37,29 @@ public class DataLoader implements CommandLineRunner {
             System.out.println("Expansion successfully created! -> " + expansionRequest.name());
 
             CardRequest koraidon = new CardRequest(
-                    "sv1-125",
+                    "sv01-125",
                     "Koraidon ex",
                     "sv1",
                     "Ultra Rare",
                     "POKEMON",
                     List.of("Fighting"),
-                    "https://images.pokemontcg.io/sv1/125.png"
+                    "https://images.pokemontcg.io/sv1/125.png",
+                    "G"
+
             );
 
             cardService.createCard(koraidon);
             System.out.println("Card successfully created! -> " + koraidon.name());
 
             CardRequest nestBall = new CardRequest(
-                    "sv1-181",
+                    "sv01-181",
                     "Nest Ball",
                     "sv1",
                     "Uncommon",
                     "TRAINER",
                     null,
-                    "https://images.pokemontcg.io/sv1/181.png"
+                    "https://images.pokemontcg.io/sv1/181.png",
+                    "G"
             );
 
             cardService.createCard(nestBall);

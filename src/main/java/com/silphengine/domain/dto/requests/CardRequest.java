@@ -25,6 +25,8 @@ public record CardRequest (
 
         List<String> types,
 
-        String imageUrl
+        String imageUrl,
+
+        String regulationMark
 ){
 }

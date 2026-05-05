@@ -40,7 +40,8 @@ public interface CardMapper {
                 cardRequest.rarity(),
                 mapStringToCardCategory(cardRequest.cardCategory()),
                 mapStringsToTypes(cardRequest.types()),
-                cardRequest.imageUrl()
+                cardRequest.imageUrl(),
+                cardRequest.regulationMark()
         );
     }
 
