@@ -152,7 +152,6 @@ class AuthenticationServiceImplTest {
 
         when(refreshTokenService.findByToken(refreshTokenString)).thenReturn(Optional.of(refreshToken));
         when(refreshTokenService.verifyExpiration(refreshToken)).thenReturn(refreshToken);
-        doNothing().when(refreshTokenService).deleteByToken(refreshTokenString);
         when(refreshTokenService.createRefreshToken(user)).thenReturn(newRefreshToken);
         when(jwtService.generateAccessToken(any(Map.class), eq(user))).thenReturn(newAccessToken);
 
@@ -166,7 +165,6 @@ class AuthenticationServiceImplTest {
 
         verify(refreshTokenService, times(1)).findByToken(refreshTokenString);
         verify(refreshTokenService, times(1)).verifyExpiration(refreshToken);
-        verify(refreshTokenService, times(1)).deleteByToken(refreshTokenString);
         verify(refreshTokenService, times(1)).createRefreshToken(user);
         verify(jwtService, times(1)).generateAccessToken(any(Map.class), eq(user));
     }

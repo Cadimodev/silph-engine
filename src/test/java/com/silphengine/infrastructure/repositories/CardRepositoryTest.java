@@ -133,7 +133,8 @@ public class CardRepositoryTest extends AbstractRepositoryIntegrationTest {
                 "Special Illustration Rare",
                 CardCategory.TRAINER,
                 List.of(),
-                "https://example.com/new-image.png"
+                "https://example.com/new-image.png",
+                "G"
         );
 
         // Should update card automatically
@@ -169,7 +170,8 @@ public class CardRepositoryTest extends AbstractRepositoryIntegrationTest {
                 managedCard.getRarity(),
                 managedCard.getCardCategory(),
                 List.of(CardType.WATER, CardType.DRAGON),
-                managedCard.getImageUrl()
+                managedCard.getImageUrl(),
+                managedCard.getRegulationMark()
         );
 
         // Should update card automatically

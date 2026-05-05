@@ -145,6 +145,7 @@ class ExpansionServiceImplTest {
         ExpansionRequest updateRequest = new ExpansionRequest(externalId, expansion.getName(), expansion.getSerieName(), expansion.getReleaseDate().plusDays(1), expansion.getTotalCards(), expansion.getLogoUrl());
         
         when(expansionRepository.findByExternalId(externalId)).thenReturn(Optional.of(expansion));
+        when(expansionRepository.save(any(Expansion.class))).thenReturn(expansion);
 
         // When
         ExpansionResponse result = expansionService.updateByExternalId(externalId, updateRequest);
@@ -155,6 +156,7 @@ class ExpansionServiceImplTest {
         assertEquals(updateRequest.serieName(), result.serieName());
         
         verify(expansionRepository, times(1)).findByExternalId(externalId);
+        verify(expansionRepository, times(1)).save(any(Expansion.class));
     }
 
     @Test

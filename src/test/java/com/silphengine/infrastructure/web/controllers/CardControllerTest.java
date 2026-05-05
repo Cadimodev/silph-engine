@@ -62,10 +62,11 @@ public class CardControllerTest {
         List<String> types = List.of("Water");
         List<CardType> typesEnum = List.of(CardType.WATER);
         String imageUrl = "https://assets.tcgdex.net/en/sv/sv02/203/high.png";
+        String regulationMark = "G";
 
 
-        CardRequest request = new CardRequest(externalId, name, expansionExternalId, rarity, cardCategory, types, imageUrl);
-        CardResponse response = new CardResponse(externalId, name, rarity, cardCategoryEnum, typesEnum, imageUrl, expansionExternalId);
+        CardRequest request = new CardRequest(externalId, name, expansionExternalId, rarity, cardCategory, types, imageUrl, regulationMark);
+        CardResponse response = new CardResponse(externalId, name, rarity, cardCategoryEnum, typesEnum, imageUrl, expansionExternalId, regulationMark);
 
         when(cardService.createCard(any(CardRequest.class))).thenReturn(response);
 
@@ -91,8 +92,9 @@ public class CardControllerTest {
         String cardCategory = "Pokemon";
         List<String> types = List.of("Water");
         String imageUrl = "https://assets.tcgdex.net/en/sv/sv02/203/high.png";
+        String regulationMark = "G";
 
-        CardRequest request = new CardRequest(externalId, name, expansionExternalId, rarity, cardCategory, types, imageUrl);
+        CardRequest request = new CardRequest(externalId, name, expansionExternalId, rarity, cardCategory, types, imageUrl, regulationMark);
 
         // When & Then
         mockMvc.perform(post("/api/v1/cards")
@@ -112,8 +114,9 @@ public class CardControllerTest {
         String cardCategory = "Pokemon";
         List<String> types = List.of("Water");
         String imageUrl = "https://assets.tcgdex.net/en/sv/sv02/203/high.png";
+        String regulationMark = "G";
 
-        CardRequest request = new CardRequest(externalId, name, expansionExternalId, rarity, cardCategory, types, imageUrl);
+        CardRequest request = new CardRequest(externalId, name, expansionExternalId, rarity, cardCategory, types, imageUrl, regulationMark);
         when(cardService.createCard(any(CardRequest.class))).thenThrow(new ResourceNotFoundException("Expansion not found"));
 
         // When & Then
@@ -134,8 +137,9 @@ public class CardControllerTest {
         String cardCategory = "Pokemon";
         List<String> types = List.of("Water");
         String imageUrl = "https://assets.tcgdex.net/en/sv/sv02/203/high.png";
+        String regulationMark = "G";
 
-        CardRequest request = new CardRequest(externalId, name, expansionExternalId, rarity, cardCategory, types, imageUrl);
+        CardRequest request = new CardRequest(externalId, name, expansionExternalId, rarity, cardCategory, types, imageUrl, regulationMark);
         when(cardService.createCard(any(CardRequest.class))).thenThrow(new DuplicateResourceException("Card already exists"));
 
         // When & Then
@@ -156,8 +160,9 @@ public class CardControllerTest {
         CardCategory cardCategoryEnum = CardCategory.POKEMON;
         List<CardType> typesEnum = List.of(CardType.WATER);
         String imageUrl = "https://assets.tcgdex.net/en/sv/sv02/203/high.png";
+        String regulationMark = "G";
 
-        CardResponse response = new CardResponse(externalId, name, rarity, cardCategoryEnum, typesEnum, imageUrl, expansionExternalId);
+        CardResponse response = new CardResponse(externalId, name, rarity, cardCategoryEnum, typesEnum, imageUrl, expansionExternalId, regulationMark);
         when(cardService.getByExternalId(eq(externalId))).thenReturn(response);
 
         // When & Then
@@ -195,6 +200,7 @@ public class CardControllerTest {
         CardCategory cardCategoryEnum = CardCategory.POKEMON;
         List<CardType> typesEnum = List.of(CardType.WATER);
         String imageUrl = "https://assets.tcgdex.net/en/sv/sv02/203/high.png";
+        String regulationMark = "G";
 
         String externalId2 = "sv02-269";
         String name2 = "Iono";
@@ -204,8 +210,8 @@ public class CardControllerTest {
         String imageUrl2 = "https://assets.tcgdex.net/en/sv/sv02/269/high.png";
 
         List<CardResponse> response = new ArrayList<>();
-        response.add(new CardResponse(externalId, name, rarity, cardCategoryEnum, typesEnum, imageUrl, expansionExternalId));
-        response.add(new CardResponse(externalId2, name2, rarity2, cardCategoryEnum2, typesEnum2, imageUrl2, expansionExternalId));
+        response.add(new CardResponse(externalId, name, rarity, cardCategoryEnum, typesEnum, imageUrl, expansionExternalId, regulationMark));
+        response.add(new CardResponse(externalId2, name2, rarity2, cardCategoryEnum2, typesEnum2, imageUrl2, expansionExternalId, regulationMark));
 
         when(cardService.getAllCards()).thenReturn(response);
 
@@ -228,6 +234,7 @@ public class CardControllerTest {
         CardCategory cardCategoryEnum = CardCategory.POKEMON;
         List<CardType> typesEnum = List.of(CardType.WATER);
         String imageUrl = "https://assets.tcgdex.net/en/sv/sv02/203/high.png";
+        String regulationMark = "G";
 
         String externalId2 = "sv02-269";
         String name2 = "Iono";
@@ -237,8 +244,8 @@ public class CardControllerTest {
         String imageUrl2 = "https://assets.tcgdex.net/en/sv/sv02/269/high.png";
 
         List<CardResponse> response = new ArrayList<>();
-        response.add(new CardResponse(externalId, name, rarity, cardCategoryEnum, typesEnum, imageUrl, expansionExternalId));
-        response.add(new CardResponse(externalId2, name2, rarity2, cardCategoryEnum2, typesEnum2, imageUrl2, expansionExternalId));
+        response.add(new CardResponse(externalId, name, rarity, cardCategoryEnum, typesEnum, imageUrl, expansionExternalId, regulationMark));
+        response.add(new CardResponse(externalId2, name2, rarity2, cardCategoryEnum2, typesEnum2, imageUrl2, expansionExternalId, regulationMark));
 
         when(cardService.getByExternalExpansionId(expansionExternalId)).thenReturn(response);
 
@@ -264,9 +271,10 @@ public class CardControllerTest {
         List<String> types = List.of("Water");
         List<CardType> typesEnum = List.of(CardType.WATER);
         String imageUrl = "https://assets.tcgdex.net/en/sv/sv02/203/high.png";
+        String regulationMark = "G";
 
-        CardRequest request = new CardRequest(externalId, name, expansionExternalId, rarity, cardCategory, types, imageUrl);
-        CardResponse response = new CardResponse(externalId, name, rarity, cardCategoryEnum, typesEnum, imageUrl, expansionExternalId);
+        CardRequest request = new CardRequest(externalId, name, expansionExternalId, rarity, cardCategory, types, imageUrl, regulationMark);
+        CardResponse response = new CardResponse(externalId, name, rarity, cardCategoryEnum, typesEnum, imageUrl, expansionExternalId, regulationMark);
 
         when(cardService.updateByExternalId(eq(externalId), any(CardRequest.class))).thenReturn(response);
 
@@ -292,8 +300,9 @@ public class CardControllerTest {
         String cardCategory = "Pokemon";
         List<String> types = List.of("Water");
         String imageUrl = "https://assets.tcgdex.net/en/sv/sv02/203/high.png";
+        String regulationMark = "G";
 
-        CardRequest request = new CardRequest(externalId, name, expansionExternalId, rarity, cardCategory, types, imageUrl);
+        CardRequest request = new CardRequest(externalId, name, expansionExternalId, rarity, cardCategory, types, imageUrl, regulationMark);
 
         // When & Then
         mockMvc.perform(put("/api/v1/cards/{externalId}", externalId)
@@ -314,8 +323,9 @@ public class CardControllerTest {
         String cardCategory = "Pokemon";
         List<String> types = List.of("Water");
         String imageUrl = "https://assets.tcgdex.net/en/sv/sv02/203/high.png";
+        String regulationMark = "G";
 
-        CardRequest request = new CardRequest("differentExternalId", name, expansionExternalId, rarity, cardCategory, types, imageUrl);
+        CardRequest request = new CardRequest("differentExternalId", name, expansionExternalId, rarity, cardCategory, types, imageUrl, regulationMark);
 
         // When & Then
         mockMvc.perform(put("/api/v1/cards/{externalId}", externalId)
@@ -335,8 +345,9 @@ public class CardControllerTest {
         String cardCategory = "Pokemon";
         List<String> types = List.of("Water");
         String imageUrl = "https://assets.tcgdex.net/en/sv/sv02/203/high.png";
+        String regulationMark = "G";
 
-        CardRequest request = new CardRequest(externalId, name, expansionExternalId, rarity, cardCategory, types, imageUrl);
+        CardRequest request = new CardRequest(externalId, name, expansionExternalId, rarity, cardCategory, types, imageUrl, regulationMark);
 
         when(cardService.updateByExternalId(eq(externalId), any(CardRequest.class))).thenThrow(new BadRequestException("A card's expansion cannot be changed"));
 
@@ -358,8 +369,9 @@ public class CardControllerTest {
         String cardCategory = "Pokemon";
         List<String> types = List.of("Water");
         String imageUrl = "https://assets.tcgdex.net/en/sv/sv02/203/high.png";
+        String regulationMark = "G";
 
-        CardRequest request = new CardRequest(externalId, name, expansionExternalId, rarity, cardCategory, types, imageUrl);
+        CardRequest request = new CardRequest(externalId, name, expansionExternalId, rarity, cardCategory, types, imageUrl, regulationMark);
 
         when(cardService.updateByExternalId(eq(externalId), any(CardRequest.class))).thenThrow(new ResourceNotFoundException("Card not found"));
 

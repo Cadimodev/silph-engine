@@ -120,7 +120,8 @@ class CardMapperTest {
                 "Rare",
                 "Pokemon",
                 List.of("Water"),
-                "newUrl"
+                "newUrl",
+                "G"
         );
 
         // When
@@ -143,7 +144,7 @@ class CardMapperTest {
 
         // When
         cardMapper.updateEntityFromRequest(existingCard, null);
-        cardMapper.updateEntityFromRequest(null, new CardRequest(null, null, null, null, null, null, null));
+        cardMapper.updateEntityFromRequest(null, new CardRequest(null, null, null, null, null, null, null, null));
 
         // Then
         assertEquals("OldName", existingCard.getName());

@@ -78,8 +78,9 @@ public class CardServiceImplTest {
         String cardCategory = CardCategory.POKEMON.toString();
         List<String> types = List.of(CardType.WATER.toString());
         String imageUrl = "https://assets.tcgdex.net/en/sv/sv02/203";
+        String regulationMark = "G";
 
-        cardRequest = new CardRequest(externalCardId, name, externalExpansionId, rarity, cardCategory, types, imageUrl);
+        cardRequest = new CardRequest(externalCardId, name, externalExpansionId, rarity, cardCategory, types, imageUrl, regulationMark);
         card = cardMapper.toEntity(cardRequest, expansion);
     }
 
@@ -202,8 +203,9 @@ public class CardServiceImplTest {
     void updateByExternalId_shouldReturnCardResponse_whenCardExists() {
 
         // Given
-        CardRequest updateRequest = new CardRequest(externalCardId, card.getName(), card.getExpansion().getExternalId(), card.getRarity(), "TRAINER", List.of("Water"), card.getImageUrl());
+        CardRequest updateRequest = new CardRequest(externalCardId, card.getName(), card.getExpansion().getExternalId(), card.getRarity(), "TRAINER", List.of("Water"), card.getImageUrl(), card.getRegulationMark());
         when(cardRepository.findByExternalId(externalCardId)).thenReturn(Optional.of(card));
+        when(cardRepository.save(any(Card.class))).thenReturn(card);
 
         // When
         CardResponse result = cardService.updateByExternalId(externalCardId, updateRequest);
@@ -214,13 +216,14 @@ public class CardServiceImplTest {
         assertEquals(updateRequest.name(), result.name());
 
         verify(cardRepository, times(1)).findByExternalId(externalCardId);
+        verify(cardRepository, times(1)).save(any(Card.class));
     }
 
     @Test
     void updateByExternalId_shouldThrowResourceNotFoundException_whenCardDoesNotExists() {
 
         // Given
-        CardRequest updateRequest = new CardRequest(externalCardId, card.getName(), card.getExpansion().getExternalId(), card.getRarity(), "TRAINER", List.of("Water"), card.getImageUrl());
+        CardRequest updateRequest = new CardRequest(externalCardId, card.getName(), card.getExpansion().getExternalId(), card.getRarity(), "TRAINER", List.of("Water"), card.getImageUrl(), card.getRegulationMark());
         when(cardRepository.findByExternalId(externalCardId)).thenReturn(Optional.empty());
 
         // When & Then
@@ -235,7 +238,7 @@ public class CardServiceImplTest {
     void updateByExternalId_shouldThrowBadRequestException_whenExpansionIDIsDifferent() {
 
         // Given
-        CardRequest updateRequest = new CardRequest(externalCardId, card.getName(), "diff-Ex-ID", card.getRarity(), "TRAINER", List.of("Water"), card.getImageUrl());
+        CardRequest updateRequest = new CardRequest(externalCardId, card.getName(), "diff-Ex-ID", card.getRarity(), "TRAINER", List.of("Water"), card.getImageUrl(), card.getRegulationMark());
         when(cardRepository.findByExternalId(externalCardId)).thenReturn(Optional.of(card));
 
         // When & Then

@@ -6,6 +6,7 @@ import com.silphengine.domain.dto.requests.PasswordChangeRequest;
 import com.silphengine.domain.dto.requests.UserProfileRequest;
 import com.silphengine.domain.dto.requests.UserRequest;
 import com.silphengine.domain.dto.responses.UserResponse;
+import com.silphengine.domain.entities.Expansion;
 import com.silphengine.domain.entities.User;
 import com.silphengine.domain.enums.Role;
 import com.silphengine.domain.exceptions.BadRequestException;
@@ -215,6 +216,7 @@ public class UserServiceImplTest {
         when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
         when(userRepository.findByNickname(userProfileRequest.nickname())).thenReturn(Optional.empty());
         when(userRepository.findByEmail(userProfileRequest.email())).thenReturn(Optional.empty());
+        when(userRepository.save(any(User.class))).thenReturn(user);
 
         // When
         UserResponse result = userService.updateUserProfile(user.getId(), userProfileRequest);
@@ -228,6 +230,7 @@ public class UserServiceImplTest {
         verify(userRepository, times(1)).findById(user.getId());
         verify(userRepository, times(1)).findByNickname(userProfileRequest.nickname());
         verify(userRepository, times(1)).findByEmail(userProfileRequest.email());
+        verify(userRepository, times(1)).save(any(User.class));
     }
 
     @Test
