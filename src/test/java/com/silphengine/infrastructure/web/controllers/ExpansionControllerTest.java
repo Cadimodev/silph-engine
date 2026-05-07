@@ -5,11 +5,13 @@ import com.silphengine.domain.dto.responses.ExpansionResponse;
 import com.silphengine.domain.exceptions.DuplicateResourceException;
 import com.silphengine.domain.exceptions.ResourceNotFoundException;
 import com.silphengine.domain.services.ExpansionService;
+import com.silphengine.infrastructure.web.config.TestSecurityConfig;
+import com.silphengine.security.annotations.WithMockCustomUser;
+import org.springframework.context.annotation.Import;
 import tools.jackson.databind.json.JsonMapper;
 import com.silphengine.security.JwtService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -23,9 +25,7 @@ import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
@@ -34,7 +34,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 
 @WebMvcTest(ExpansionController.class)
-@AutoConfigureMockMvc(addFilters = false)
+@Import(TestSecurityConfig.class)
 public class ExpansionControllerTest {
 
     @Autowired
@@ -50,6 +50,7 @@ public class ExpansionControllerTest {
     private JwtService jwtService;
 
     @Test
+    @WithMockCustomUser(roles = {"ADMIN"})
     void createExpansion_shouldReturnCreatedAndExpansionResponse_whenRequestIsValid() throws Exception {
 
         // Given
@@ -77,6 +78,7 @@ public class ExpansionControllerTest {
     }
 
     @Test
+    @WithMockCustomUser(roles = {"ADMIN"})
     void createExpansion_shouldReturnBadRequest_whenRequestIsInvalid() throws Exception {
 
         // Given
@@ -97,6 +99,7 @@ public class ExpansionControllerTest {
     }
 
     @Test
+    @WithMockCustomUser(roles = {"ADMIN"})
     void createExpansion_shouldReturnConflict_whenExpansionAlreadyExists() throws Exception {
 
         // Given
@@ -117,6 +120,30 @@ public class ExpansionControllerTest {
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isConflict());
     }
+
+    @Test
+    @WithMockCustomUser
+    void createExpansion_shouldReturnForbidden_whenHavingUserRole() throws Exception {
+
+        // Given
+        String externalId = "swsh3";
+        String name = "Darkness Ablaze";
+        String serieName = "Sword & Shield";
+        LocalDate releaseDate = LocalDate.of(2020, 8, 14);
+        int totalCards = 201;
+        String logoUrl = "https://images.pokemontcg.io/swsh3/logo.png";
+
+        ExpansionRequest request = new ExpansionRequest(externalId, name, serieName, releaseDate, totalCards, logoUrl);
+
+        // When & Then
+        mockMvc.perform(post("/api/v1/expansions")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isForbidden());
+
+        verify(expansionService, never()).createExpansion(any());
+    }
+
 
     @Test
     void getExpansionByExternalId_shouldReturnOkAndExpansionResponse_whenExpansionExists() throws Exception {
@@ -190,6 +217,7 @@ public class ExpansionControllerTest {
     }
 
     @Test
+    @WithMockCustomUser(roles = {"ADMIN"})
     void updateExpansion_shouldReturnOkAndExpansionResponse_whenUpdatedCorrectly() throws Exception {
 
         // Given
@@ -218,6 +246,7 @@ public class ExpansionControllerTest {
     }
 
     @Test
+    @WithMockCustomUser(roles = {"ADMIN"})
     void updateExpansion_shouldReturnBadRequest_whenRequestIsNotValid() throws Exception {
 
         // Given
@@ -238,6 +267,7 @@ public class ExpansionControllerTest {
     }
 
     @Test
+    @WithMockCustomUser(roles = {"ADMIN"})
     void updateExpansion_shouldReturnBadRequest_whenDifferentExternalIds() throws Exception {
 
         // Given
@@ -258,6 +288,7 @@ public class ExpansionControllerTest {
     }
 
     @Test
+    @WithMockCustomUser(roles = {"ADMIN"})
     void updateExpansion_shouldReturnNotFound_whenExpansionDoesNotExists() throws Exception {
 
         // Given
@@ -279,6 +310,31 @@ public class ExpansionControllerTest {
     }
 
     @Test
+    @WithMockCustomUser
+    void updateExpansion_shouldReturnForbidden_whenHavingUserRole() throws Exception {
+
+        // Given
+        String externalId = "swsh3";
+        String name = "differentName";
+        String serieName = "Sword & Shield";
+        LocalDate releaseDate = LocalDate.of(2020, 8, 14);
+        int totalCards = 201;
+        String logoUrl = "https://images.pokemontcg.io/swsh3/logo.png";
+
+        ExpansionRequest request = new ExpansionRequest(externalId, name, serieName, releaseDate, totalCards, logoUrl);
+
+        // When & Then
+        mockMvc.perform(put("/api/v1/expansions/{externalId}", externalId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isForbidden());
+
+        verify(expansionService, never()).updateByExternalId(any(), any());
+    }
+
+
+    @Test
+    @WithMockCustomUser(roles = {"ADMIN"})
     void deleteExpansion_shouldReturnNoContent_whenRequestIsValid() throws Exception {
 
         // Given
@@ -292,6 +348,7 @@ public class ExpansionControllerTest {
     }
 
     @Test
+    @WithMockCustomUser(roles = {"ADMIN"})
     void deleteExpansion_shouldReturnNotFound_whenExpansionDoesNotExists() throws Exception {
 
         // Given
@@ -302,5 +359,20 @@ public class ExpansionControllerTest {
         mockMvc.perform(delete("/api/v1/expansions/{externalId}", externalId)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @WithMockCustomUser
+    void deleteExpansion_shouldReturnForbidden_whenHavingUserRole() throws Exception {
+
+        // Given
+        String externalId = "swsh3";
+
+        // When & Then
+        mockMvc.perform(delete("/api/v1/expansions/{externalId}", externalId)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isForbidden());
+
+        verify(expansionService, never()).removeByExternalId(any());
     }
 }

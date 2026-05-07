@@ -8,6 +8,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,6 +20,7 @@ public class ExpansionController {
 
     private final ExpansionService expansionService;
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
     public ResponseEntity<ExpansionResponse> createExpansion(@Valid @RequestBody ExpansionRequest request) {
         ExpansionResponse response = expansionService.createExpansion(request);
@@ -35,6 +37,7 @@ public class ExpansionController {
         return ResponseEntity.ok(expansionService.getAllExpansions());
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{externalId}")
     public ResponseEntity<ExpansionResponse> updateExpansion(
             @PathVariable String externalId,
@@ -48,6 +51,7 @@ public class ExpansionController {
         return ResponseEntity.ok(expansionService.updateByExternalId(externalId, request));
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{externalId}")
     public ResponseEntity<Void> deleteExpansion(@PathVariable String externalId) {
         expansionService.removeByExternalId(externalId);
