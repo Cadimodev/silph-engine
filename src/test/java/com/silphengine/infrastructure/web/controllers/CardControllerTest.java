@@ -8,11 +8,14 @@ import com.silphengine.domain.exceptions.BadRequestException;
 import com.silphengine.domain.exceptions.DuplicateResourceException;
 import com.silphengine.domain.exceptions.ResourceNotFoundException;
 import com.silphengine.domain.services.CardService;
+import com.silphengine.infrastructure.web.config.TestSecurityConfig;
 import com.silphengine.security.JwtService;
+import com.silphengine.security.annotations.WithMockCustomUser;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
@@ -26,6 +29,7 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
@@ -34,7 +38,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
 @WebMvcTest(CardController.class)
-@AutoConfigureMockMvc(addFilters = false)
+@Import(TestSecurityConfig.class)
 public class CardControllerTest {
 
     @Autowired
@@ -50,6 +54,7 @@ public class CardControllerTest {
     private JwtService jwtService;
 
     @Test
+    @WithMockCustomUser(roles = {"ADMIN"})
     void createCard_shouldReturnCreatedAndCardResponse_whenRequestIsValid() throws Exception {
 
         //Given
@@ -82,6 +87,7 @@ public class CardControllerTest {
     }
 
     @Test
+    @WithMockCustomUser(roles = {"ADMIN"})
     void createCard_shouldReturnBadRequest_whenRequestIsInvalid() throws Exception {
 
         //Given
@@ -104,6 +110,7 @@ public class CardControllerTest {
     }
 
     @Test
+    @WithMockCustomUser(roles = {"ADMIN"})
     void createCard_shouldReturnNotFound_whenExpansionDoesNotExists() throws Exception {
 
         //Given
@@ -127,6 +134,7 @@ public class CardControllerTest {
     }
 
     @Test
+    @WithMockCustomUser(roles = {"ADMIN"})
     void createCard_shouldReturnConflict_whenCardAlreadyExists() throws Exception {
 
         //Given
@@ -150,7 +158,32 @@ public class CardControllerTest {
     }
 
     @Test
-    void getCardsByExternalId_shouldReturnOkAndCardResponse_whenCardExists() throws Exception {
+    @WithMockCustomUser
+    void createCard_shouldReturnForbidden_whenHavingUserRole() throws Exception {
+
+        //Given
+        String externalId = "sv02-203";
+        String name = "Magikarp";
+        String expansionExternalId = "sv02";
+        String rarity = "Illustration rare";
+        String cardCategory = "Pokemon";
+        CardCategory cardCategoryEnum = CardCategory.POKEMON;
+        List<String> types = List.of("Water");
+        List<CardType> typesEnum = List.of(CardType.WATER);
+        String imageUrl = "https://assets.tcgdex.net/en/sv/sv02/203/high.png";
+        String regulationMark = "G";
+
+        CardRequest request = new CardRequest(externalId, name, expansionExternalId, rarity, cardCategory, types, imageUrl, regulationMark);
+
+        // When & Then
+        mockMvc.perform(post("/api/v1/cards")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void getCardByExternalId_shouldReturnOkAndCardResponse_whenCardExists() throws Exception {
 
         //Given
         String externalId = "sv02-203";
@@ -259,6 +292,7 @@ public class CardControllerTest {
     }
 
     @Test
+    @WithMockCustomUser(roles = {"ADMIN"})
     void updateCardByExternalId_shouldReturnOkCardResponse_whenUpdatedCorrectly() throws Exception {
 
         //Given
@@ -290,6 +324,7 @@ public class CardControllerTest {
     }
 
     @Test
+    @WithMockCustomUser(roles = {"ADMIN"})
     void updateCardByExternalId_shouldReturnBadRequest_whenRequestIsNotValid() throws Exception {
 
         //Given
@@ -313,6 +348,7 @@ public class CardControllerTest {
 
 
     @Test
+    @WithMockCustomUser(roles = {"ADMIN"})
     void updateCardByExternalId_shouldReturnBadRequest_whenDifferentExternalIds() throws Exception {
 
         //Given
@@ -335,6 +371,7 @@ public class CardControllerTest {
     }
 
     @Test
+    @WithMockCustomUser(roles = {"ADMIN"})
     void updateCardByExternalId_shouldReturnBadRequest_whenUpdatingExpansionId() throws Exception {
 
         //Given
@@ -359,6 +396,7 @@ public class CardControllerTest {
     }
 
     @Test
+    @WithMockCustomUser(roles = {"ADMIN"})
     void updateCardByExternalId_shouldReturnNotFound_whenCardDoesNotExists() throws Exception {
 
         //Given
@@ -383,6 +421,33 @@ public class CardControllerTest {
     }
 
     @Test
+    @WithMockCustomUser
+    void updateCardByExternalId_shouldReturnForbidden_whenHavingUserRole() throws Exception {
+
+        //Given
+        String externalId = "sv02-203";
+        String name = "NewName";
+        String expansionExternalId = "sv02";
+        String rarity = "Illustration rare";
+        String cardCategory = "Pokemon";
+        List<String> types = List.of("Water");
+        String imageUrl = "https://assets.tcgdex.net/en/sv/sv02/203/high.png";
+        String regulationMark = "G";
+
+        CardRequest request = new CardRequest(externalId, name, expansionExternalId, rarity, cardCategory, types, imageUrl, regulationMark);
+
+        // When & Then
+        mockMvc.perform(put("/api/v1/cards/{externalId}", externalId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isForbidden());
+
+        verify(cardService, never()).updateByExternalId(any(), any());
+
+    }
+
+    @Test
+    @WithMockCustomUser(roles = {"ADMIN"})
     void deleteCard_shouldReturnNoContent_whenRequestIsValid() throws Exception {
 
         // Given
@@ -396,6 +461,7 @@ public class CardControllerTest {
     }
 
     @Test
+    @WithMockCustomUser(roles = {"ADMIN"})
     void deleteCard_shouldReturnNotFound_whenExpansionDoesNotExists() throws Exception {
 
         // Given
@@ -406,6 +472,20 @@ public class CardControllerTest {
         mockMvc.perform(delete("/api/v1/cards/{externalId}", externalId)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @WithMockCustomUser
+    void deleteCard_shouldReturnForbidden_whenHavingUserRole() throws Exception {
+
+        // Given
+        String externalId = "sv02-203";
+        doNothing().when(cardService).deleteByExternalId(externalId);
+
+        // When & Then
+        mockMvc.perform(delete("/api/v1/cards/{externalId}", externalId)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isForbidden());
     }
 
 }

@@ -8,6 +8,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,6 +20,7 @@ public class CardController {
 
     private final CardService cardService;
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
     public ResponseEntity<CardResponse> createCard(@Valid @RequestBody CardRequest request) {
 
@@ -42,6 +44,7 @@ public class CardController {
         return ResponseEntity.ok(cardService.getAllCards());
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{externalId}")
     public ResponseEntity<CardResponse> updateCardByExternalId(
             @PathVariable String externalId,
@@ -55,6 +58,7 @@ public class CardController {
        return ResponseEntity.ok(cardService.updateByExternalId(externalId, request));
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{externalId}")
     public ResponseEntity<Void> deleteCardByExternalId(@PathVariable String externalId) {
 
