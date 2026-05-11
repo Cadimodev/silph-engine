@@ -17,6 +17,7 @@ public interface UserMapper {
     @Mapping(target = "collection", ignore = true)
     @Mapping(target = "decks", ignore = true)
     @Mapping(target = "role", ignore = true)
+    @Mapping(target = "refreshToken", ignore = true)
     @Mapping(target = "password", source = "encodedPassword")
     User toEntity(UserRequest userRequest, String encodedPassword);
 

@@ -25,6 +25,7 @@ public interface InventoryCardMapper {
     InventoryCard toEntity(InventoryCardRequest request, User owner, Card card);
 
     @Mapping(target = "card", source = "entity.card")
+    @Mapping(target = "card.expansionExternalId", source = "entity.card.expansion.externalId")
     InventoryCardResponse toResponse(InventoryCard entity);
 
     default void updateEntityFromRequest(InventoryCard card, UpdateInventoryCardRequest request) {
