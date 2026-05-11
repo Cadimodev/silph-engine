@@ -44,20 +44,20 @@ public interface InventoryCardMapper {
             throw new BadRequestException("Card condition cannot be null or empty");
         }
         try{
-            return CardCondition.valueOf(cardConditionString.toUpperCase().trim());
+            return CardCondition.valueOf(cardConditionString.trim().replace(" ", "_").toUpperCase());
         } catch (IllegalArgumentException e) {
             throw new BadRequestException("Condition not recognized: " + cardConditionString);
         }
     }
 
     @Named("stringToFinish")
-    default CardFinish mapStringToCardFInish(String cardFinishString) {
+    default CardFinish mapStringToCardFinish(String cardFinishString) {
 
         if (cardFinishString == null || cardFinishString.isBlank()) {
             throw new BadRequestException("Card finish cannot be null or empty");
         }
         try{
-            return CardFinish.valueOf(cardFinishString.toUpperCase().trim());
+            return CardFinish.valueOf(cardFinishString.trim().replace(" ", "_").toUpperCase());
         } catch (IllegalArgumentException e) {
             throw new BadRequestException("Finish not recognized: " + cardFinishString);
         }
