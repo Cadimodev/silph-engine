@@ -14,6 +14,10 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import java.time.LocalDate;
 import java.util.Collections;
@@ -200,5 +204,26 @@ class ExpansionServiceImplTest {
         assertNotNull(result);
         assertTrue(result.isEmpty());
         verify(expansionRepository, times(1)).findAll();
+    }
+
+    @Test
+    void getExpansions_shouldReturnPageOfExpansionResponses() {
+
+        // Given
+        Pageable pageable = PageRequest.of(0, 10);
+        Page<Expansion> expansionPage = new PageImpl<>(List.of(expansion), pageable, 1);
+
+        when(expansionRepository.findAll(eq(pageable))).thenReturn(expansionPage);
+
+        // When
+        Page<ExpansionResponse> result = expansionService.getExpansions(pageable);
+
+        // Then
+        assertNotNull(result);
+        assertFalse(result.isEmpty());
+        assertEquals(1, result.getTotalElements());
+        assertEquals(expansion.getExternalId(), result.getContent().getFirst().externalId());
+
+        verify(expansionRepository, times(1)).findAll(pageable);
     }
 }

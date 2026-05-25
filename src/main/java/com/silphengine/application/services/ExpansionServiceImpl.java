@@ -9,6 +9,8 @@ import com.silphengine.domain.exceptions.ResourceNotFoundException;
 import com.silphengine.domain.services.ExpansionService;
 import com.silphengine.infrastructure.repositories.ExpansionRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -69,5 +71,13 @@ public class ExpansionServiceImpl implements ExpansionService {
                 .stream()
                 .map(expansionMapper::toResponse)
                 .toList();
+    }
+
+    @Override
+    public Page<ExpansionResponse> getExpansions(Pageable pageable) {
+
+        Page<Expansion> expansionPage = expansionRepository.findAll(pageable);
+
+        return expansionPage.map(expansionMapper::toResponse);
     }
 }
