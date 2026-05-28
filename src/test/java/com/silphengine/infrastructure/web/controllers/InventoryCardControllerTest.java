@@ -340,7 +340,9 @@ public class InventoryCardControllerTest {
     }
 
     private CardResponse getDefaultCardResponse(Card card) {
-        return new CardResponse(card.getExternalId(),
+        return new CardResponse(
+                card.getId(),
+                card.getExternalId(),
                 card.getName(),
                 card.getRarity(),
                 card.getCardCategory(),

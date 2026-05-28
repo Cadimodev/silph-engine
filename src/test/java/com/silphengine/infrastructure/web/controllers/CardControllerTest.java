@@ -27,6 +27,7 @@ import tools.jackson.databind.json.JsonMapper;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.ArgumentMatchers.any;
@@ -60,6 +61,7 @@ public class CardControllerTest {
     void createCard_shouldReturnCreatedAndCardResponse_whenRequestIsValid() throws Exception {
 
         //Given
+        UUID id = UUID.randomUUID();
         String externalId = "sv02-203";
         String name = "Magikarp";
         String expansionExternalId = "sv02";
@@ -73,7 +75,7 @@ public class CardControllerTest {
 
 
         CardRequest request = new CardRequest(externalId, name, expansionExternalId, rarity, cardCategory, types, imageUrl, regulationMark);
-        CardResponse response = new CardResponse(externalId, name, rarity, cardCategoryEnum, typesEnum, imageUrl, expansionExternalId, regulationMark);
+        CardResponse response = new CardResponse(id, externalId, name, rarity, cardCategoryEnum, typesEnum, imageUrl, expansionExternalId, regulationMark);
 
         when(cardService.createCard(any(CardRequest.class))).thenReturn(response);
 
@@ -188,6 +190,7 @@ public class CardControllerTest {
     void getCardByExternalId_shouldReturnOkAndCardResponse_whenCardExists() throws Exception {
 
         //Given
+        UUID id = UUID.randomUUID();
         String externalId = "sv02-203";
         String name = "Magikarp";
         String expansionExternalId = "sv02";
@@ -197,7 +200,7 @@ public class CardControllerTest {
         String imageUrl = "https://assets.tcgdex.net/en/sv/sv02/203/high.png";
         String regulationMark = "G";
 
-        CardResponse response = new CardResponse(externalId, name, rarity, cardCategoryEnum, typesEnum, imageUrl, expansionExternalId, regulationMark);
+        CardResponse response = new CardResponse(id, externalId, name, rarity, cardCategoryEnum, typesEnum, imageUrl, expansionExternalId, regulationMark);
         when(cardService.getByExternalId(eq(externalId))).thenReturn(response);
 
         // When & Then
@@ -228,6 +231,7 @@ public class CardControllerTest {
     void getCards_shouldReturnOkAndPageOfCardResponse_whenExpansionParamIsEmpty() throws Exception {
 
         //Given
+        UUID id = UUID.randomUUID();
         String externalId = "sv02-203";
         String name = "Magikarp";
         String expansionExternalId = "sv02";
@@ -237,6 +241,7 @@ public class CardControllerTest {
         String imageUrl = "https://assets.tcgdex.net/en/sv/sv02/203/high.png";
         String regulationMark = "G";
 
+        UUID id2 = UUID.randomUUID();
         String externalId2 = "sv02-269";
         String name2 = "Iono";
         String rarity2 = "Special Illustration rare";
@@ -246,8 +251,8 @@ public class CardControllerTest {
 
         Pageable pageable = PageRequest.of(0, 10);
         List<CardResponse> cardResponseList = new ArrayList<>();
-        cardResponseList.add(new CardResponse(externalId, name, rarity, cardCategoryEnum, typesEnum, imageUrl, expansionExternalId, regulationMark));
-        cardResponseList.add(new CardResponse(externalId2, name2, rarity2, cardCategoryEnum2, typesEnum2, imageUrl2, expansionExternalId, regulationMark));
+        cardResponseList.add(new CardResponse(id, externalId, name, rarity, cardCategoryEnum, typesEnum, imageUrl, expansionExternalId, regulationMark));
+        cardResponseList.add(new CardResponse(id2, externalId2, name2, rarity2, cardCategoryEnum2, typesEnum2, imageUrl2, expansionExternalId, regulationMark));
         Page<CardResponse> response = new PageImpl<>(cardResponseList, pageable, cardResponseList.size());
 
         when(cardService.getAllCards(any(Pageable.class))).thenReturn(response);
@@ -264,6 +269,7 @@ public class CardControllerTest {
     void getCards_shouldReturnOkAndPageOfCardResponse_whenExpansionParamHasValue() throws Exception {
 
         //Given
+        UUID id = UUID.randomUUID();
         String externalId = "sv02-203";
         String name = "Magikarp";
         String expansionExternalId = "sv02";
@@ -273,6 +279,7 @@ public class CardControllerTest {
         String imageUrl = "https://assets.tcgdex.net/en/sv/sv02/203/high.png";
         String regulationMark = "G";
 
+        UUID id2 = UUID.randomUUID();
         String externalId2 = "sv02-269";
         String name2 = "Iono";
         String rarity2 = "Special Illustration rare";
@@ -282,8 +289,8 @@ public class CardControllerTest {
 
         Pageable pageable = PageRequest.of(0, 10);
         List<CardResponse> cardResponseList = new ArrayList<>();
-        cardResponseList.add(new CardResponse(externalId, name, rarity, cardCategoryEnum, typesEnum, imageUrl, expansionExternalId, regulationMark));
-        cardResponseList.add(new CardResponse(externalId2, name2, rarity2, cardCategoryEnum2, typesEnum2, imageUrl2, expansionExternalId, regulationMark));
+        cardResponseList.add(new CardResponse(id, externalId, name, rarity, cardCategoryEnum, typesEnum, imageUrl, expansionExternalId, regulationMark));
+        cardResponseList.add(new CardResponse(id2, externalId2, name2, rarity2, cardCategoryEnum2, typesEnum2, imageUrl2, expansionExternalId, regulationMark));
         Page<CardResponse> response = new PageImpl<>(cardResponseList, pageable, cardResponseList.size());
 
         when(cardService.getByExternalExpansionId(eq(expansionExternalId), any(Pageable.class))).thenReturn(response);
@@ -302,6 +309,7 @@ public class CardControllerTest {
     void updateCardByExternalId_shouldReturnOkCardResponse_whenUpdatedCorrectly() throws Exception {
 
         //Given
+        UUID id = UUID.randomUUID();
         String externalId = "sv02-203";
         String name = "NewName";
         String expansionExternalId = "sv02";
@@ -314,7 +322,7 @@ public class CardControllerTest {
         String regulationMark = "G";
 
         CardRequest request = new CardRequest(externalId, name, expansionExternalId, rarity, cardCategory, types, imageUrl, regulationMark);
-        CardResponse response = new CardResponse(externalId, name, rarity, cardCategoryEnum, typesEnum, imageUrl, expansionExternalId, regulationMark);
+        CardResponse response = new CardResponse(id, externalId, name, rarity, cardCategoryEnum, typesEnum, imageUrl, expansionExternalId, regulationMark);
 
         when(cardService.updateByExternalId(eq(externalId), any(CardRequest.class))).thenReturn(response);
 

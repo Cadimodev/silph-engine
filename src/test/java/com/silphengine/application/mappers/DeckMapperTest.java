@@ -103,6 +103,7 @@ public class DeckMapperTest {
                 .build();
 
         CardResponse mockCardResponse = new CardResponse(
+                card.getId(),
                 card.getExternalId(),
                 card.getName(),
                 card.getRarity(),

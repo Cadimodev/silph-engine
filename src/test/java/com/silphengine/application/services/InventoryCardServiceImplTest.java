@@ -85,7 +85,7 @@ public class InventoryCardServiceImplTest {
                 .build();
 
         cardResponse = new CardResponse(
-                card.getExternalId(), card.getName(), card.getRarity(),
+                card.getId(), card.getExternalId(), card.getName(), card.getRarity(),
                 card.getCardCategory(), card.getTypes(), card.getImageUrl(), "expansionExternalID", card.getRegulationMark());
 
         inventoryCard = InventoryCard.builder()
