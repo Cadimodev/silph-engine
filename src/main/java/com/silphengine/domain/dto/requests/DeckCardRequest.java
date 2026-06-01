@@ -1,7 +1,7 @@
 package com.silphengine.domain.dto.requests;
 
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Positive;
 
 import java.util.UUID;
 
@@ -10,6 +10,6 @@ public record DeckCardRequest(
         UUID cardId,
 
         @NotNull(message = "Quantity is mandatory")
-        @Positive(message = "Quantity must be greater than zero")
+        @Min(value = 0, message = "Quantity cannot be negative")
         Integer quantity
 ) {}

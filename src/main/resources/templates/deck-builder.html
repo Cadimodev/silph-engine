@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Silph Engine - Deck Builder</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/deck-builder.css}">
+</head>
+<body>
+
+<div th:replace="~{fragments/navbar :: app-navbar}"></div>
+
+<div class="row g-0">
+
+    <div class="col-12 col-lg-3 builder-col col-left d-flex flex-column align-items-center">
+        <div id="inspectorWrapper" class="w-100 text-center d-none">
+            <h4 id="inspectName" class="text-warning fw-bold mb-3">Card Inspector</h4>
+            <img id="inspectImg" src="" class="card-preview-img mb-4" alt="Card Preview">
+            <div class="d-flex justify-content-center gap-2 mb-3">
+                <button class="btn btn-outline-danger fw-bold px-3" onclick="alterInspectQty(-1)">&minus;</button>
+                <span id="inspectQtyDisplay" class="fs-4 fw-bold text-light px-2">1</span>
+                <button class="btn btn-outline-success fw-bold px-3" onclick="alterInspectQty(1)">&plus;</button>
+            </div>
+            <p id="inspectDetails" class="text-white-50 small"></p>
+        </div>
+        <div id="inspectorPlaceholder" class="my-auto text-white-50 text-center small">
+            🔍 Click any card to inspect details and manage copies.
+        </div>
+    </div>
+
+    <div class="col-12 col-lg-5 builder-col col-center">
+        <div class="d-flex gap-2 mb-4">
+            <input type="text" id="deckNameInput" th:value="${deck.name}" class="form-control form-control-lg bg-dark-input fw-bold text-warning" onchange="saveDeckName()">
+            <button class="btn btn-warning fw-bold text-dark px-4" onclick="window.location.href='/decks'">Save</button>
+        </div>
+
+        <div id="deckCenterList" class="w-100">
+
+            <div class="d-flex justify-content-between align-items-center mb-3 p-2 bg-dark rounded border border-secondary shadow-sm">
+                <span class="badge bg-dark border border-secondary text-light px-3 py-2 fs-6"
+                      th:text="${#aggregates.sum(deck.cards.![quantity]) ?: 0} + ' / 60 Cards'">
+                    0 / 60 Cards
+                </span>
+
+                <div>
+                    <span th:if="${deck.isLegal}" class="badge bg-success text-dark fw-bold px-3 py-2 fs-6">
+                        Standard Legal
+                    </span>
+                    <span th:unless="${deck.isLegal}" class="badge bg-secondary text-white-50 px-3 py-2 fs-6">
+                        Not Legal
+                    </span>
+                </div>
+            </div>
+
+            <div th:if="${deck.cards.isEmpty()}" class="text-white-50 text-center py-5 small border border-secondary border-dashed rounded">
+                Your deck is empty. Use the search bar on the right to add cards!
+            </div>
+
+            <div th:each="line : ${deck.cards}" class="deck-entry p-2 mb-2 d-flex align-items-center justify-content-between search-mini-card"
+                 th:onclick="prepareInspection([[${line.card.id}]], [[${line.card.name}]], [[${line.card.imageUrl}]], [[${line.card.rarity}]])">
+                <div class="d-flex align-items-center gap-3">
+                    <span class="badge bg-warning text-dark fw-bold fs-6" th:text="${line.quantity}">1</span>
+                    <span class="fw-bold text-light" th:text="${line.card.name}">Mega Greninja ex</span>
+                </div>
+                <small class="text-white-50 px-2" th:text="${line.card.rarity}">Rare</small>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-12 col-lg-4 builder-col col-right">
+        <div class="mb-4">
+            <input type="text" id="sidebarSearch" class="form-control bg-dark-input" placeholder="🔍 Search cards to add... (e.g., Greninja)" autocomplete="off">
+        </div>
+        <div id="sidebarResults" class="row row-cols-3 g-2">
+        </div>
+    </div>
+
+</div>
+
+<script th:inline="javascript">
+    const deckId = [[${deck.id}]];
+    let currentInspectedCardId = null;
+    let currentInspectedQty = 0;
+
+    let searchDebounce;
+    document.getElementById('sidebarSearch').addEventListener('input', (e) => {
+        clearTimeout(searchDebounce);
+        const query = e.target.value.trim();
+        if(query.length < 2) {
+            document.getElementById('sidebarResults').innerHTML = '';
+            return;
+        }
+        searchDebounce = setTimeout(() => fetchSidebarCards(query), 300);
+    });
+
+    async function fetchSidebarCards(query) {
+        const resultsContainer = document.getElementById('sidebarResults');
+        try {
+            resultsContainer.innerHTML = '<div class="col-12 text-center text-white-50 small">Searching...</div>';
+
+            const url = `/api/v1/cards?search=${encodeURIComponent(query)}&size=24&sort=expansion.releaseDate,desc`;
+            const response = await fetch(url);
+
+            if (!response.ok) {
+                resultsContainer.innerHTML = '<div class="col-12 text-center text-danger small">Error fetching cards</div>';
+                return;
+            }
+
+            const pageData = await response.json();
+            const cards = pageData.content || [];
+
+            let gridHtml = '';
+            cards.forEach(card => {
+                const imgUrl = card.imageUrl ? card.imageUrl : '';
+
+                gridHtml += `
+                    <div class="col text-center">
+                        <img src="${imgUrl}/low.png"
+                             class="search-mini-card mini-img"
+                             alt="${card.name}"
+                             title="${card.name}"
+                             onclick="prepareInspection('${card.id}', \`${card.name.replace(/'/g, "\\'")}\`, '${imgUrl}', '${card.rarity}')">
+                    </div>
+                `;
+            });
+
+            resultsContainer.innerHTML = gridHtml || '<div class="col-12 text-center text-white-50 small">No cards found</div>';
+        } catch (err) {
+            console.error("API Search Error:", err);
+            resultsContainer.innerHTML = '<div class="col-12 text-center text-danger small">Connection error</div>';
+        }
+    }
+
+    function prepareInspection(cardId, cardName, imgUrl, rarity) {
+        const currentLine = document.querySelector(`[onclick*="${cardId}"]`);
+        let currentQty = 0;
+        if (currentLine) {
+            const badge = currentLine.querySelector('.badge');
+            if (badge) currentQty = parseInt(badge.textContent);
+        }
+        inspectCard(cardId, cardName, imgUrl, currentQty, rarity);
+    }
+
+    function inspectCard(id, name, imgUrl, quantity, rarity) {
+        currentInspectedCardId = id;
+        currentInspectedQty = quantity;
+
+        document.getElementById('inspectorPlaceholder').classList.add('d-none');
+        document.getElementById('inspectorWrapper').classList.remove('d-none');
+
+        document.getElementById('inspectName').textContent = name;
+
+        const finalImgUrl = imgUrl.endsWith('/high.png') ? imgUrl : (imgUrl ? `${imgUrl}/high.png` : 'https://placehold.co/400x550/212529/FFF?text=No+Image');
+        document.getElementById('inspectImg').src = finalImgUrl;
+
+        document.getElementById('inspectQtyDisplay').textContent = quantity;
+        document.getElementById('inspectDetails').textContent = `Rarity: ${rarity}`;
+    }
+
+    async function alterInspectQty(change) {
+        if (!currentInspectedCardId) return;
+        const targetQty = currentInspectedQty + change;
+
+        if (targetQty < 0) return;
+
+        try {
+            const response = await fetch(`/decks/${deckId}/cards`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ cardId: currentInspectedCardId, quantity: targetQty })
+            });
+
+            const listRes = await fetch(`/decks/${deckId}/html-list`);
+            const htmlContent = await listRes.text();
+            document.getElementById('deckCenterList').innerHTML = htmlContent;
+
+            currentInspectedQty = targetQty;
+            document.getElementById('inspectQtyDisplay').textContent = targetQty;
+
+        } catch (err) { console.error("Error lowering quantity:", err); }
+    }
+
+    function closeInspector() {
+        currentInspectedCardId = null;
+        document.getElementById('inspectorPlaceholder').classList.remove('d-none');
+        document.getElementById('inspectorWrapper').classList.add('d-none');
+    }
+
+    async function saveDeckName() {
+        const newName = document.getElementById('deckNameInput').value;
+        await fetch(`/decks/${deckId}/name?name=${encodeURIComponent(newName)}`, { method: 'POST' });
+    }
+</script>
+</body>
+</html>

@@ -1,0 +1,4 @@
+body { background-color: #121212; color: #e0e0e0; }
+.card-deck { background-color: #1e1e1e; border: 1px solid #2d2d2d; transition: transform 0.2s; }
+.card-deck:hover { transform: translateY(-3px); border-color: #ffc107; }
+.deck-title { color: #ffc107; font-weight: bold; }

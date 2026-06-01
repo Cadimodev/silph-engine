@@ -4,6 +4,8 @@ import com.silphengine.application.config.FormatProperties;
 import com.silphengine.application.mappers.DeckMapper;
 import com.silphengine.domain.dto.requests.DeckCardRequest;
 import com.silphengine.domain.dto.requests.DeckRequest;
+import com.silphengine.domain.dto.responses.CardResponse;
+import com.silphengine.domain.dto.responses.DeckCardResponse;
 import com.silphengine.domain.dto.responses.DeckResponse;
 import com.silphengine.domain.entities.Card;
 import com.silphengine.domain.entities.Deck;
@@ -128,6 +130,85 @@ public class DeckServiceImpl implements DeckService {
         );
 
         deckRepository.delete(deck);
+    }
+
+    @Override
+    @Transactional
+    public DeckResponse createEmptyDeck(UUID ownerId) {
+
+        User user = userRepository.findById(ownerId).orElseThrow(
+                () -> new ResourceNotFoundException("User with ID: " + ownerId + " not found")
+        );
+
+        Deck newDeck = Deck.builder()
+                .name("New Deck")
+                .owner(user)
+                .build();
+
+        newDeck.evaluateLegality(formatProperties.getStandardValidMarks());
+
+        return deckMapper.toResponse(deckRepository.save(newDeck));
+    }
+
+    @Override
+    @Transactional
+    public DeckCardResponse updateDeckCardQuantity(UUID deckId, UUID ownerId, DeckCardRequest request) {
+
+        Deck deck = deckRepository.findByIdAndOwnerId(deckId, ownerId)
+                .orElseThrow(() -> new ResourceNotFoundException("Deck with ID: " + deckId + " not found"));
+
+        Card card = cardRepository.findById(request.cardId())
+                .orElseThrow(() -> new ResourceNotFoundException("Card with ID: " + request.cardId() + " not found"));
+
+        Optional<DeckCard> existingLine = deck.getCards().stream()
+                .filter(dc -> dc.getCard().getId().equals(card.getId()))
+                .findFirst();
+
+        int finalQuantity = 0;
+
+        if (existingLine.isPresent()) {
+            DeckCard line = existingLine.get();
+            if (request.quantity() <= 0) {
+                deck.removeCard(line);
+            } else {
+                line.changeQuantity(request.quantity());
+                finalQuantity = line.getQuantity();
+            }
+        } else if (request.quantity() > 0) {
+            DeckCard newLine = DeckCard.builder()
+                    .card(card)
+                    .deck(deck)
+                    .quantity(request.quantity())
+                    .build();
+            deck.addCard(newLine);
+            finalQuantity = newLine.getQuantity();
+        }
+
+        deck.evaluateLegality(formatProperties.getStandardValidMarks());
+        deckRepository.save(deck);
+
+        CardResponse cr = new CardResponse(
+                card.getId(), card.getExternalId(), card.getName(), card.getRarity(),
+                card.getCardCategory(), card.getTypes(), card.getImageUrl(),
+                card.getExpansion().getExternalId(), card.getRegulationMark()
+        );
+
+        return new DeckCardResponse(cr, finalQuantity);
+    }
+
+    @Override
+    @Transactional
+    public void updateDeckName(UUID deckId, UUID ownerId, String newName) {
+
+        if (newName == null || newName.isBlank()) {
+            throw new IllegalArgumentException("Deck name cannot be blank");
+        }
+
+        Deck deck = deckRepository.findByIdAndOwnerId(deckId, ownerId)
+                .orElseThrow(() -> new ResourceNotFoundException("Deck with ID: " + deckId + " not found"));
+
+        deck.updateDetails(newName.trim(), deck.getIsLegal());
+        deckRepository.save(deck);
     }
 
     private List<DeckCard> getDeckCardFromRequest(List<DeckCardRequest> requestCards) {

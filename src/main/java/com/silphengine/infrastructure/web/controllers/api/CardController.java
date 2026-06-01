@@ -36,7 +36,12 @@ public class CardController {
     @GetMapping
     public ResponseEntity<Page<CardResponse>> getCards(
             @RequestParam(required = false) String expansion,
+            @RequestParam(required = false) String search,
             Pageable pageable) {
+
+        if (search != null && !search.isBlank()) {
+            return ResponseEntity.ok(cardService.getCardsByName(search, pageable));
+        }
 
         if (expansion != null) {
             return ResponseEntity.ok(cardService.getByExternalExpansionId(expansion, pageable));

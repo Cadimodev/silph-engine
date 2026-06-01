@@ -24,6 +24,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -58,6 +59,7 @@ public class DeckServiceImplTest {
     private Card card;
     private DeckRequest deckRequest;
     private DeckCard deckCard;
+    private Expansion expansion;
 
     @BeforeEach
     void setUp() {
@@ -67,6 +69,12 @@ public class DeckServiceImplTest {
         owner = User.builder()
                 .id(UUID.randomUUID())
                 .nickname("Ash")
+                .build();
+                
+        expansion = Expansion.builder()
+                .id(UUID.randomUUID())
+                .externalId("sv02")
+                .name("Paldea Evolved")
                 .build();
 
         card = Card.builder()
@@ -78,6 +86,7 @@ public class DeckServiceImplTest {
                 .types(List.of(CardType.WATER))
                 .imageUrl("https://assets.tcgdex.net/en/sv/sv02/203")
                 .regulationMark("G")
+                .expansion(expansion)
                 .build();
 
         deckCard = DeckCard.builder()
@@ -92,7 +101,7 @@ public class DeckServiceImplTest {
                 .name(deckRequest.name())
                 .owner(owner)
                 .isLegal(false)
-                .cards(List.of(deckCard))
+                .cards(new ArrayList<>(List.of(deckCard)))
                 .build();
 
         deckResponse = new DeckResponse(
@@ -392,4 +401,113 @@ public class DeckServiceImplTest {
         verifyNoMoreInteractions(deckRepository);
     }
 
+    @Test
+    void createEmptyDeck_shouldReturnDeckResponse_whenUserExists() {
+
+        // Given
+        when(userRepository.findById(owner.getId())).thenReturn(Optional.of(owner));
+        when(deckRepository.save(any(Deck.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        when(deckMapper.toResponse(any(Deck.class))).thenAnswer(invocation -> {
+            Deck savedDeck = invocation.getArgument(0);
+            return new DeckResponse(savedDeck.getId(), savedDeck.getOwner().getId(), savedDeck.getName(), savedDeck.getIsLegal(), List.of());
+        });
+
+        // When
+        DeckResponse result = deckService.createEmptyDeck(owner.getId());
+
+        // Then
+        assertNotNull(result);
+        assertEquals("New Deck", result.name());
+        verify(userRepository, times(1)).findById(owner.getId());
+        verify(deckRepository, times(1)).save(any(Deck.class));
+    }
+
+    @Test
+    void createEmptyDeck_shouldThrowResourceNotFound_whenUserDoesNotExists() {
+
+        // Given
+        when(userRepository.findById(owner.getId())).thenReturn(Optional.empty());
+
+        // When & Then
+        assertThrows(ResourceNotFoundException.class, () -> deckService.createEmptyDeck(owner.getId()));
+        verify(userRepository, times(1)).findById(owner.getId());
+    }
+
+    @Test
+    void updateDeckCardQuantity_shouldUpdateQuantity_whenCardExistsInDeck() {
+
+        // Given
+        DeckCardRequest request = new DeckCardRequest(card.getId(), 2);
+        when(deckRepository.findByIdAndOwnerId(deck.getId(), owner.getId())).thenReturn(Optional.of(deck));
+        when(cardRepository.findById(card.getId())).thenReturn(Optional.of(card));
+
+        // When
+        deckService.updateDeckCardQuantity(deck.getId(), owner.getId(), request);
+
+        // Then
+        assertEquals(2, deckCard.getQuantity());
+        verify(deckRepository, times(1)).save(deck);
+    }
+
+    @Test
+    void updateDeckCardQuantity_shouldAddCard_whenCardDoesNotExistsInDeck() {
+
+        // Given
+        Card newCard = Card.builder().id(UUID.randomUUID()).expansion(expansion).build();
+        DeckCardRequest request = new DeckCardRequest(newCard.getId(), 1);
+        deck.getCards().clear();
+
+        when(deckRepository.findByIdAndOwnerId(deck.getId(), owner.getId())).thenReturn(Optional.of(deck));
+        when(cardRepository.findById(newCard.getId())).thenReturn(Optional.of(newCard));
+
+        // When
+        deckService.updateDeckCardQuantity(deck.getId(), owner.getId(), request);
+
+        // Then
+        assertEquals(1, deck.getCards().size());
+        verify(deckRepository, times(1)).save(deck);
+    }
+
+    @Test
+    void updateDeckCardQuantity_shouldRemoveCard_whenQuantityIsZeroOrLess() {
+
+        // Given
+        DeckCardRequest request = new DeckCardRequest(card.getId(), 0);
+        when(deckRepository.findByIdAndOwnerId(deck.getId(), owner.getId())).thenReturn(Optional.of(deck));
+        when(cardRepository.findById(card.getId())).thenReturn(Optional.of(card));
+
+        // When
+        deckService.updateDeckCardQuantity(deck.getId(), owner.getId(), request);
+
+        // Then
+        assertTrue(deck.getCards().isEmpty());
+        verify(deckRepository, times(1)).save(deck);
+    }
+
+    @Test
+    void updateDeckName_shouldUpdateName_whenNameIsValid() {
+
+        // Given
+        String newName = "Updated Deck Name";
+        when(deckRepository.findByIdAndOwnerId(deck.getId(), owner.getId())).thenReturn(Optional.of(deck));
+
+        // When
+        deckService.updateDeckName(deck.getId(), owner.getId(), newName);
+
+        // Then
+        assertEquals(newName, deck.getName());
+        verify(deckRepository, times(1)).save(deck);
+    }
+
+    @Test
+    void updateDeckName_shouldThrowIllegalArgumentException_whenNameIsBlank() {
+
+        // Given
+        String newName = " ";
+
+        // When & Then
+        assertThrows(IllegalArgumentException.class, () -> deckService.updateDeckName(deck.getId(), owner.getId(), newName));
+
+        verifyNoMoreInteractions(deckRepository);
+    }
 }

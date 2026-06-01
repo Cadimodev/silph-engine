@@ -1,6 +1,8 @@
 package com.silphengine.domain.services;
 
+import com.silphengine.domain.dto.requests.DeckCardRequest;
 import com.silphengine.domain.dto.requests.DeckRequest;
+import com.silphengine.domain.dto.responses.DeckCardResponse;
 import com.silphengine.domain.dto.responses.DeckResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -21,4 +23,10 @@ public interface DeckService {
     DeckResponse updateDeck(UUID deckId, DeckRequest deckRequest, UUID ownerId);
 
     void deleteDeck(UUID deckId, UUID ownerID);
+
+    DeckResponse createEmptyDeck(UUID ownerId);
+
+    DeckCardResponse updateDeckCardQuantity(UUID deckId, UUID ownerId, DeckCardRequest request);
+
+    void updateDeckName(UUID deckId, UUID ownerId, String newName);
 }
