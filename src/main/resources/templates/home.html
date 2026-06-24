@@ -12,11 +12,13 @@
 
 <div th:replace="~{fragments/navbar :: app-navbar}"></div>
 
-<div class="container hero-section">
-    <div class="row justify-content-center">
-        <div class="col-md-8">
-            <img th:src="@{/images/logo.png}" src="https://via.placeholder.com/400x200?text=Silph+Engine" alt="Silph Engine Logo" class="hero-img">
+<div class="hero-image-container">
+    <img th:src="@{/images/home.png}" alt="Silph Engine Banner" class="hero-img-full">
+</div>
 
+<div class="container hero-text-section">
+    <div class="row justify-content-center">
+        <div class="col-md-8 text-center">
             <h1 class="display-4 fw-bold mb-3 text-warning">Silph Engine</h1>
             <p class="lead text-secondary mb-4">
                 The ultimate backend ecosystem for Pokémon TCG management and deck validation.
