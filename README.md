@@ -157,7 +157,7 @@ The fastest way to test the API is by using the pre-built Docker image automatic
 
 2. **Start the environment:**
 ```bash
-   docker-compose up -d
+   docker compose up -d
    ```
 
 ### Option B: Local Development (Build from Source)
@@ -171,7 +171,7 @@ If you want to review the code or contribute, the project uses a multi-stage Doc
 
 2. **Build and launch:**
 ```bash
-   docker-compose up --build
+   docker compose up --build
    ```
 
 <div align="center">
