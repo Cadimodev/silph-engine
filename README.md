@@ -22,11 +22,11 @@ Whether you are a collector tracking the "mintiness" of a rare card or a player 
 
 ## 🛠️ Technologies & Stack
 
-This project leverages modern backend practices and tooling to ensure data integrity and non-blocking scalability:
+This project leverages modern backend practices and tooling to ensure data integrity and performance:
 
 - **Core Frameworks:** Java 25, Spring Boot, Maven
 - **Persistence:** PostgreSQL, JPA (Hibernate), Flyway (Database Migrations)
-- **Architecture & Performance:** Concurrency via Virtual Threads (Project Loom), MapStruct, Lombok
+- **Architecture & Performance:** MapStruct, Lombok
 - **Security:** Spring Security with JWT
 - **Infrastructure:** Docker & Docker Compose
 - **Testing & API:** Testcontainers, SpringDoc OpenAPI (Swagger UI), Thymeleaf
